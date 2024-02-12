@@ -1,14 +1,16 @@
 import { Queue, QueueOptions } from "bullmq";
 
-export class Producer<T> {
+export class Producer<T, U extends string> {
   private queue: Queue;
+  private name: string;
 
   constructor(name: string, opts: QueueOptions) {
     this.queue = new Queue<T>(name, opts);
+    this.name = name;
   }
 
-  async enqueue(jobName: string, mail: T) {
-    await this.queue.add(jobName, mail);
+  async add(jobName: U, data: T) {
+    return await this.queue.add(jobName, data);
   }
 
   close() {
@@ -16,5 +18,8 @@ export class Producer<T> {
   }
   getQueue() {
     return this.queue;
+  }
+  getName() {
+    return this.name;
   }
 }

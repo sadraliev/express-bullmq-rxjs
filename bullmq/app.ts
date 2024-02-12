@@ -2,9 +2,11 @@ import express from "express";
 import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { ExpressAdapter } from "@bull-board/express";
-import { getRandomEmail, mailProducer, mailQueue } from "./queues/mail";
+import { mailProducer, mailQueue, randomEmail } from "./queues/mail";
 import { MailjobType } from "./queues/mail/mail.interface";
-import { goodQueue } from "./queues/goods";
+import { goodProducer, goodQueue, randomGood } from "./queues/goods";
+import { authQueue } from "./queues/auth";
+import { simulateRequest } from "./utils/main";
 
 const app = express();
 
@@ -12,17 +14,39 @@ const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath("/bullmq/dashboard");
 
 createBullBoard({
-  queues: [new BullMQAdapter(mailQueue), new BullMQAdapter(goodQueue)],
+  queues: [
+    new BullMQAdapter(mailQueue),
+    new BullMQAdapter(goodQueue),
+    new BullMQAdapter(authQueue),
+  ],
   serverAdapter,
 });
 
 app.use("/bullmq/dashboard", serverAdapter.getRouter());
 
-app.use("/sent-email", (_, res) => {
-  const sender = getRandomEmail();
-  const receiver = getRandomEmail();
+app.get("/goods", async (_, res) => {
+  await simulateRequest({}, 10000);
+  res.json({
+    ok: true,
+  });
+});
 
-  mailProducer.enqueue(MailjobType.mailProcess, {
+app.post("/goods", (_, res) => {
+  const good = randomGood();
+  goodProducer.add("insert-good", good);
+
+  res.json({
+    ok: true,
+    message: "good accepted for processing",
+    data: good,
+  });
+});
+
+app.get("/run", (_, res) => {
+  const sender = randomEmail();
+  const receiver = randomEmail();
+
+  mailProducer.add(MailjobType.mailProcess, {
     from: sender,
     subject: "This is a simple test",
     text: "An email sent using BullMQ",

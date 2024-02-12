@@ -1,8 +1,8 @@
 import { getRedisConfig } from "../../config/redis.configuration";
 import { Producer } from "../../lib/producer";
-import { MAIL_QUEUE, Mail } from "./mail.interface";
+import { MAIL_QUEUE, Mail, MailTypeValues } from "./mail.interface";
 
-export const mailProducer = new Producer<Mail>(MAIL_QUEUE, {
+export const mailProducer = new Producer<Mail, MailTypeValues>(MAIL_QUEUE, {
   connection: getRedisConfig(),
 });
 

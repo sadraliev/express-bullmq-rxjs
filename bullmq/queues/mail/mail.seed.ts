@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
 
-export function getRandomEmail() {
+export function randomEmail() {
   return faker.internet.email();
 }

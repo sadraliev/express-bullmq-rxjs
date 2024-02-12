@@ -1,5 +1,5 @@
 import { Worker } from "bullmq";
-import { MailProcessor } from "./mail.process";
+import { MailProcessor } from "./mail.processor";
 import { getRedisConfig } from "../../config/redis.configuration";
 import { MAIL_QUEUE } from "./mail.interface";
 

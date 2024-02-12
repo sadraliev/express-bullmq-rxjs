@@ -15,3 +15,5 @@ export const randomGood = () => ({
   gtin: faker.string.numeric(13),
   name: faker.commerce.productName(),
 });
+
+export const randomGoodId = () => faker.string.uuid();
